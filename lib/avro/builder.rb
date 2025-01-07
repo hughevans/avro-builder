@@ -26,6 +26,12 @@ module Avro
     def self.add_load_path(*paths)
       Avro::Builder::DSL.load_paths.merge(paths)
     end
+
+    # Define extra allowable metadata attributes for fields
+    def self.extra_metadata_attributes(*attrs)
+      Avro::Builder::Field.extra_metadata_attributes(attrs)
+      Avro::Builder::Record.extra_metadata_attributes(attrs)
+    end
   end
 end
 
