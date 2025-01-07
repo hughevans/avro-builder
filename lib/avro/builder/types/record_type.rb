@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'avro/builder/metadata'
+
 module Avro
   module Builder
     module Types
@@ -7,6 +9,7 @@ module Avro
       # at the top-level or as the type for a field in a record.
       class RecordType < Avro::Builder::Types::NamedType
         include Avro::Builder::AnonymousTypes
+        include Avro::Builder::Metadata
 
         DSL_METHODS = [:required, :optional, :extends].to_set.freeze
 
@@ -62,15 +65,22 @@ module Avro
 
         def to_h(reference_state = SchemaSerializerReferenceState.new)
           reference_state.definition_or_reference(fullname) do
-            {
+            attrs = {
               type: :record,
               name: name,
               namespace: namespace,
-              doc: doc,
-              aliases: aliases,
-              logicalType: logical_type,
               fields: fields.values.map { |field| field.serialize(reference_state) }
-            }.reject { |_, v| v.nil? }
+            }
+
+            self.class.dsl_attribute_names.reject do |attr|
+              [:abstract, :type_name, :type_namespace, :type_aliases, :type_doc].include?(attr)
+            end.each do |attr|
+              attrs[attr] = send(attr)
+            end
+
+            attrs[:logicalType] = attrs.delete(:logical_type)
+
+            attrs.reject { |_, v| v.nil? }
           end
         end
         alias_method :serialize, :to_h

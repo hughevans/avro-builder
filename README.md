@@ -458,18 +458,14 @@ Avro::Builder::Rake::AvroGenerateTask.new(name: :custom_gen,
 end
 ```
 
-### Extra metadata field attributes
+### Extra metadata attributes
 
-According to the [Avro specification](https://avro.apache.org/docs/1.12.0/specification/) any attribute can be added to a field and used as extra metadata provided it does not clash with the other attributes specified.
+According to the [Avro specification](https://avro.apache.org/docs/1.12.0/specification/) any attribute can be added to a record or field and be used as extra metadata provided it does not clash with the attributes specified.
 
-To enable the use of specific custom metadata attributes you can define them with:
+To enable the use of specific custom metadata attributes on records or fields you can define them with:
 
 ```ruby
-Avro::Builder.extra_metadata_attributes(
-  :sensitivity,
-  :deprecated_by,
-  :reference
-)
+Avro::Builder.extra_metadata_attributes(:sensitivity, :deprecated_by, :documentation_url)
 ```
 
 ## Development

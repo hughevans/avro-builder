@@ -2,7 +2,7 @@
 
 describe Avro::Builder, ".extra_metadata_attributes" do
   before do
-    Avro::Builder.extra_metadata_attributes(:reference, :deprecated_by)
+    Avro::Builder.extra_metadata_attributes(:reference, :deprecated_by, :documentation_url)
   end
 
   context "applying attributes to fields in a record" do
@@ -48,6 +48,34 @@ describe Avro::Builder, ".extra_metadata_attributes" do
           { name: :d, type: [:null, :double], default: nil },
           { name: :many_bits, type: :bytes }
         ]
+      }
+    end
+
+    it { is_expected.to be_json_eql(expected.to_json) }
+  end
+
+  context "applying attributes to the record" do
+    subject(:schema_json) do
+      described_class.build do
+        record :r do
+          documentation_url 'https://example.com/docs'
+          reference 'internal-reference'
+          required :b, :boolean
+          optional :d, :double
+        end
+      end
+    end
+
+    let(:expected) do
+      {
+        type: :record,
+        name: :r,
+        fields: [
+          { name: :b, type: :boolean },
+          { name: :d, type: [:null, :double], default: nil }
+        ],
+        documentation_url: 'https://example.com/docs',
+        reference: 'internal-reference'
       }
     end
 
